@@ -8,78 +8,16 @@ let
 
 in
 {
-  boot.initrd.availableKernelModules = [
-    "ata_piix"
-    "uhci_hcd"
-    "ehci_pci"
-    "sr_mod"
-    "virtio_net"
-    "virtio_pci"
-    "virtio_mmio"
-    "virtio_blk"
-    "virtio_scsi"
-    "9p"
-    "9pnet_virtio"
+
+  imports = [
+    ./hardware/v2d-config.nix
+    # Import only the sourcehut modules
+    "${srht-modules}/nixos/modules/services/misc/sourcehut"
   ];
-  boot.initrd.kernelModules = [
-    "virtio_balloon" "virtio_console" "virtio_rng"
-  ];
-  boot.initrd.postDeviceCommands =
-    ''
-      # Set the system time from the hardware clock to work around a
-      # bug in qemu-kvm > 1.5.2 (where the VM clock is initialised
-      # to the *boot time* of the host).
-      hwclock -s
-    '';
-
-  boot.kernelModules = [ ];
-  boot.extraModulePackages = [ ];
-  security.rngd.enable = lib.mkDefault false;
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/67203570-b8e3-4a88-b24e-883aafb29826";
-      fsType = "ext4";
-    };
-
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/2f71be5e-5def-47aa-8813-56efe5f8bce1"; }
-    ];
-
-  nix.maxJobs = lib.mkDefault 6;
-  nix = {
-    package = pkgs.nixUnstable;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-  };
-
-  boot.loader.grub.enable = true;
-  boot.loader.grub.version = 2;
-  boot.loader.grub.device = "/dev/vda";
 
   networking = {
     hostName = "darkserver";
     domain = "dark.fi";
-    enableIPv6 = true;
-    # nat = {
-    #   enable = true;
-    #   externalInterface = "ens3";
-    # };
-    useDHCP = false;
-    # usePredictableInterfaceNames = false;
-    interfaces = {
-      ens3 = {
-        useDHCP = true;
-        # ipv6 = {
-        #   routes = [
-        #     {
-        #       address = "2a0b:ee80:0:2:185:189:151:64";
-        #       prefixLength = 64;
-        #       via = "2a0b:ee80:0:2::1";
-        #     }
-        #   ];
-        # };
-      };
-    };
     firewall = {
       enable = true;
       interfaces.ens3 = let
@@ -106,15 +44,50 @@ in
 
   time.timeZone = "Europe/Amsterdam";
 
-  # Import only the sourcehut modules
-  imports = [ "${srht-modules}/nixos/modules/services/misc/sourcehut" ];
+  nix = {
+    package = pkgs.nixUnstable;
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+  };
+
+  nixpkgs.overlays = [
+    (self: super: {
+      element-web = super.element-web.override {
+        conf = {
+          default_server_config = {
+            "m.homeserver" = {
+              "base_url" = "https://matrix.${config.networking.domain}";
+              "server_name" = "${config.networking.domain}";
+            };
+            "m.identity_server" = {
+              "base_url" = "https://vector.im";
+            };
+          };
+
+          jitsi.preferredDomain = "jitsi.${config.networking.domain}";
+        };
+      };
+      sourcehut = pkgs-srht.sourcehut;
+    }
+    )
+  ];
 
   services = {
     sourcehut = {
 	    enable = true;
-	    services = [ "meta" "todo" "git" "hub" "builds" "lists" "man" "paste" "dispatch" ];
+	    services = [
+        "meta"
+        "todo"
+        "git"
+        "hub"
+        "builds"
+        "lists"
+        "man"
+        "paste"
+        "dispatch"
+      ];
       originBase = "${config.networking.domain}";
-      #hostName = "${config.networking.domain}";
       meta = {
         port = 5007;
       };
@@ -449,31 +422,6 @@ in
       email = "janus@dark.fi";
     };
   };
-  # secrets.files.coturn.file = ./secrets/coturn;
-  # secrets.files.coturn.user = "root";
-  #environment.etc.foo.source = config.secrets.files.foo.file;
-
-  nixpkgs.overlays = [
-    (self: super: {
-      element-web = super.element-web.override {
-        conf = {
-          default_server_config = {
-            "m.homeserver" = {
-              "base_url" = "https://matrix.${config.networking.domain}";
-              "server_name" = "${config.networking.domain}";
-            };
-            "m.identity_server" = {
-              "base_url" = "https://vector.im";
-            };
-          };
-
-          jitsi.preferredDomain = "jitsi.${config.networking.domain}";
-        };
-      };
-      sourcehut = pkgs-srht.sourcehut;
-    }
-    )
-  ];
 
   environment = {
     systemPackages = with pkgs; [
