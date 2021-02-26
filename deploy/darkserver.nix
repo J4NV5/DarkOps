@@ -110,7 +110,7 @@ in
 	    settings."git.sr.ht" = {
 		    origin = "https://git.${config.networking.domain}";
 		    outgoing-domain = "https://git.${config.networking.domain}";
-        repos = "/git";
+        repos = "/var/lib/git";
 	    };
       settings."hub.sr.ht" = {
 		    origin = "https://code.${config.networking.domain}";
@@ -494,7 +494,7 @@ in
 ";
     users = {
       git = {
-        home = "/git";
+        home = "/var/lib/git";
         isNormalUser = true;
       };
       tasks = {
