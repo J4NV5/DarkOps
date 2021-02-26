@@ -75,8 +75,8 @@ in
 
   services = {
     sourcehut = {
-	    enable = true;
-	    services = [
+      enable = true;
+      services = [
         "meta"
         "todo"
         "git"
@@ -91,66 +91,68 @@ in
       meta = {
         port = 5007;
       };
-	    settings."sr.ht" = {
-		    environment = "production";
+      settings."sr.ht" = {
+        environment = "production";
         site-name = "DarkForge";
         site-blurb = "forge of the Dark Renaissance";
         owner-name = "Janus";
         owner-email = "janus@dark.fi";
-		    global-domain = "${config.networking.domain}";
-		    origin = "https://${config.networking.domain}";
-		    secret-key= "${builtins.readFile ./secrets/sourcehut/secret_key}";
-		    network-key = "${builtins.readFile ./secrets/sourcehut/network_key}";
-		    service-key = "${builtins.readFile ./secrets/sourcehut/service_key}";
-		    private-key= "${builtins.readFile ./secrets/sourcehut/private_key}";
-	    };
-      settings."dispatch.sr.ht" = {
-		    origin = "https://dispatch.${config.networking.domain}";
+        global-domain = "${config.networking.domain}";
+        origin = "https://${config.networking.domain}";
+        secret-key= "${builtins.readFile ./secrets/sourcehut/secret_key}";
+        network-key = "${builtins.readFile ./secrets/sourcehut/network_key}";
+        service-key = "${builtins.readFile ./secrets/sourcehut/service_key}";
+        private-key= "${builtins.readFile ./secrets/sourcehut/private_key}";
       };
-	    settings."git.sr.ht" = {
-		    origin = "https://git.${config.networking.domain}";
-		    outgoing-domain = "https://git.${config.networking.domain}";
+      settings."dispatch.sr.ht" = {
+        origin = "https://dispatch.${config.networking.domain}";
+      };
+      settings."git.sr.ht" = {
+        origin = "https://git.${config.networking.domain}";
+        outgoing-domain = "https://git.${config.networking.domain}";
         repos = "/var/lib/git";
-	    };
+      };
       settings."hub.sr.ht" = {
-		    origin = "https://code.${config.networking.domain}";
-	    };
+        origin = "https://code.${config.networking.domain}";
+      };
       settings."builds.sr.ht" = {
-		    origin = "https://builds.${config.networking.domain}";
-		    oauth-client-id = "SECRET";
-		    oauth-client-secret = "SECRET";
-		    # obtain manuall from /oauth
+        origin = "https://builds.${config.networking.domain}";
+        oauth-client-id = "SECRET";
+        oauth-client-secret = "SECRET";
+        # obtain manuall from /oauth
       };
       settings."builds.sr.ht::worker".name = "localhost:12345";
       settings."lists.sr.ht" = {
-		    origin = "https://lists.${config.networking.domain}";
-		    private-key= "SECRET";
+        origin = "https://lists.${config.networking.domain}";
+        private-key= "SECRET";
       };
       settings."man.sr.ht" = {
-		    origin = "https://man.${config.networking.domain}";
+        origin = "https://man.${config.networking.domain}";
       };
       settings."paste.sr.ht" = {
-		    origin = "https://paste.${config.networking.domain}";
+        origin = "https://paste.${config.networking.domain}";
       };
       settings."todo.sr.ht" = {
-		    origin = "https://todo.${config.networking.domain}";
+        origin = "https://todo.${config.networking.domain}";
       };
       settings."meta.sr.ht::settings".registration = "no";
-      settings."meta.sr.ht::settings".onboarding-redirect = shcfg.settings."meta.sr.ht".origin;
+      settings."meta.sr.ht::settings".onboarding-redirect =
+        shcfg.settings."meta.sr.ht".origin;
       settings."meta.sr.ht" = {
-		    origin = "https://meta.${config.networking.domain}";
+        origin = "https://meta.${config.networking.domain}";
       };
-	    settings.webhooks = {
-		    origin = "https://${config.networking.domain}";
-        private-key = "${builtins.readFile ./secrets/sourcehut/webhooks_private_key}";
-	    };
-	    settings.mail = {
-		    smtp-host = "localhost";
-		    smtp-port = 1025;
-		    smtp-user = "org@dark.fi";
-		    smtp-from = "org@dark.fi";
-		    smtp-password = "${builtins.readFile ./secrets/smtp_pass}";
-	    };
+      settings.webhooks = {
+        origin = "https://${config.networking.domain}";
+        private-key =
+          "${builtins.readFile ./secrets/sourcehut/webhooks_private_key}";
+      };
+      settings.mail = {
+        smtp-host = "localhost";
+        smtp-port = 1025;
+        smtp-user = "org@dark.fi";
+        smtp-from = "org@dark.fi";
+        smtp-password = "${builtins.readFile ./secrets/smtp_pass}";
+      };
     };
     openssh = {
       enable = true;
@@ -219,7 +221,9 @@ in
 
           locations."= /.well-known/matrix/server".extraConfig =
             let
-              server = { "m.server" = "matrix.${config.networking.domain}:443"; };
+              server = {
+                "m.server" = "matrix.${config.networking.domain}:443";
+              };
             in ''
             add_header Content-Type application/json;
             return 200 '${builtins.toJSON server}';
@@ -244,66 +248,66 @@ in
         "builds.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5002";
-	        locations."/query".proxyPass = "http://127.0.0.1:5102";
-	        locations."/static".root = "${pkgs-srht.sourcehut.buildsrht}/${pkgs-srht.sourcehut.python.sitePackages}/buildsrht";
+          locations."/".proxyPass = "http://127.0.0.1:5002";
+          locations."/query".proxyPass = "http://127.0.0.1:5102";
+          locations."/static".root = "${pkgs-srht.sourcehut.buildsrht}/${pkgs-srht.sourcehut.python.sitePackages}/buildsrht";
         };
         "dispatch.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5005";
-	        locations."/query".proxyPass = "http://127.0.0.1:5105";
-	        locations."/static".root = "${pkgs-srht.sourcehut.dispatchsrht}/${pkgs.sourcehut.python.sitePackages}/dispatchsrht";
+          locations."/".proxyPass = "http://127.0.0.1:5005";
+          locations."/query".proxyPass = "http://127.0.0.1:5105";
+          locations."/static".root = "${pkgs-srht.sourcehut.dispatchsrht}/${pkgs.sourcehut.python.sitePackages}/dispatchsrht";
         };
         "git.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5001";
-	        locations."/query".proxyPass = "http://127.0.0.1:5101";
-	        locations."/static".root = "${pkgs-srht.sourcehut.gitsrht}/${pkgs-srht.sourcehut.python.sitePackages}/gitsrht";
+          locations."/".proxyPass = "http://127.0.0.1:5001";
+          locations."/query".proxyPass = "http://127.0.0.1:5101";
+          locations."/static".root = "${pkgs-srht.sourcehut.gitsrht}/${pkgs-srht.sourcehut.python.sitePackages}/gitsrht";
         };
         "lists.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5006";
-	        locations."/query".proxyPass = "http://127.0.0.1:5106";
-	        locations."/static".root = "${pkgs-srht.sourcehut.listssrht}/${pkgs-srht.sourcehut.python.sitePackages}/listssrht";
+          locations."/".proxyPass = "http://127.0.0.1:5006";
+          locations."/query".proxyPass = "http://127.0.0.1:5106";
+          locations."/static".root = "${pkgs-srht.sourcehut.listssrht}/${pkgs-srht.sourcehut.python.sitePackages}/listssrht";
         };
         "man.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5004";
-	        locations."/query".proxyPass = "http://127.0.0.1:5104";
-	        locations."/static".root = "${pkgs-srht.sourcehut.mansrht}/${pkgs-srht.sourcehut.python.sitePackages}/mansrht";
+          locations."/".proxyPass = "http://127.0.0.1:5004";
+          locations."/query".proxyPass = "http://127.0.0.1:5104";
+          locations."/static".root = "${pkgs-srht.sourcehut.mansrht}/${pkgs-srht.sourcehut.python.sitePackages}/mansrht";
         };
         "meta.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5007";
-	        locations."/query".proxyPass = "http://127.0.0.1:5107";
-	        locations."/static".root = "${pkgs-srht.sourcehut.metasrht}/${pkgs-srht.sourcehut.python.sitePackages}/metasrht";
+          locations."/".proxyPass = "http://127.0.0.1:5007";
+          locations."/query".proxyPass = "http://127.0.0.1:5107";
+          locations."/static".root = "${pkgs-srht.sourcehut.metasrht}/${pkgs-srht.sourcehut.python.sitePackages}/metasrht";
         };
         "code.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5014";
-	        locations."/query".proxyPass = "http://127.0.0.1:5114";
-	        locations."/static".root = "${pkgs-srht.sourcehut.hubsrht}/${pkgs-srht.sourcehut.python.sitePackages}/hubsrht";
+          locations."/".proxyPass = "http://127.0.0.1:5014";
+          locations."/query".proxyPass = "http://127.0.0.1:5114";
+          locations."/static".root = "${pkgs-srht.sourcehut.hubsrht}/${pkgs-srht.sourcehut.python.sitePackages}/hubsrht";
 
         };
         "paste.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5011";
-	        locations."/query".proxyPass = "http://127.0.0.1:5111";
-	        locations."/static".root = "${pkgs-srht.sourcehut.pastesrht}/${pkgs-srht.sourcehut.python.sitePackages}/pastesrht";
+          locations."/".proxyPass = "http://127.0.0.1:5011";
+          locations."/query".proxyPass = "http://127.0.0.1:5111";
+          locations."/static".root = "${pkgs-srht.sourcehut.pastesrht}/${pkgs-srht.sourcehut.python.sitePackages}/pastesrht";
         };
         "todo.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
-	        locations."/".proxyPass = "http://127.0.0.1:5003";
-	        locations."/query".proxyPass = "http://127.0.0.1:5103";
-	        locations."/static".root = "${pkgs-srht.sourcehut.todosrht}/${pkgs-srht.sourcehut.python.sitePackages}/todosrht";
+          locations."/".proxyPass = "http://127.0.0.1:5003";
+          locations."/query".proxyPass = "http://127.0.0.1:5103";
+          locations."/static".root = "${pkgs-srht.sourcehut.todosrht}/${pkgs-srht.sourcehut.python.sitePackages}/todosrht";
         };
       }; # virtualhosts
     };
@@ -315,7 +319,8 @@ in
       enable_registration = false;
       federation_rc_concurrent = "0";
       federation_rc_reject_limit = "0";
-      registration_shared_secret = "${builtins.readFile ./secrets/matrix_registration}";
+      registration_shared_secret =
+        "${builtins.readFile ./secrets/matrix_registration}";
       verbose = "0";
       database_type = "psycopg2";
       database_args = {
@@ -502,7 +507,8 @@ in
         isNormalUser = true;
         description = "Taskwarrior Account";
         extraGroups = [ "taskd" ];
-        openssh.authorizedKeys.keys = import ./secrets/pubkeys/tasks.nix { inherit pkgs; };
+        openssh.authorizedKeys.keys =
+          import ./secrets/pubkeys/tasks.nix { inherit pkgs; };
       };
       janus = {
         isNormalUser = true;
