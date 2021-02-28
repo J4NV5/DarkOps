@@ -3,3 +3,4 @@
 ** SMTP connection to Hydroxide for Matrix email still doesn't work
 ** Haven't tested builds.dark.fi or dispatch.dark.fi
 ** Backups not implemented, BorgBackups planned.
+** Provide SSH access properly with cool services
