@@ -1,0 +1,4 @@
+* Darkserver
+** Make Hydroxide a systemd service
+** SMTP connection to Hydroxide for Matrix email still doesn't work
+** Haven't tested builds.dark.fi or dispatch.dark.fi
