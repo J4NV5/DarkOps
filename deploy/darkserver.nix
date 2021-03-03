@@ -91,6 +91,22 @@ in
       meta = {
         port = 5007;
       };
+      builds.enableWorker = true;
+      builds.images =
+        let
+          # Pinning to unstable to allow usage with flakes and limit rebuilds.
+          pkgs_unstable = builtins.fetchGit {
+            url = "https://github.com/NixOS/nixpkgs";
+            rev = "ff96a0fa5635770390b184ae74debea75c3fd534";
+            ref = "nixos-unstable";
+          };
+          image_from_nixpkgs = pkgs_unstable: (import ("${pkgs.sourcehut.buildsrht}/lib/images/nixos/image.nix") {
+            pkgs = (import pkgs_unstable { });
+          });
+        in
+          {
+            nixos.unstable.x86_64 = image_from_nixpkgs pkgs_unstable;
+          };
       settings."sr.ht" = {
         environment = "production";
         site-name = "DarkForge";
@@ -117,14 +133,18 @@ in
       };
       settings."builds.sr.ht" = {
         origin = "https://builds.${config.networking.domain}";
-        oauth-client-id = "SECRET";
-        oauth-client-secret = "SECRET";
-        # obtain manuall from /oauth
+        oauth-client-id =
+          "${builtins.readFile ./secrets/sourcehut/builds_client_id}";
+        oauth-client-secret =
+          "${builtins.readFile ./secrets/sourcehut/builds_client_secret}";
       };
       settings."builds.sr.ht::worker".name = "localhost:12345";
       settings."lists.sr.ht" = {
         origin = "https://lists.${config.networking.domain}";
-        private-key= "SECRET";
+        oauth-client-id =
+          "${builtins.readFile ./secrets/sourcehut/lists_client_id}";
+        oauth-client-secret =
+          "${builtins.readFile ./secrets/sourcehut/lists_client_secret}";
       };
       settings."man.sr.ht" = {
         origin = "https://man.${config.networking.domain}";
@@ -461,40 +481,37 @@ in
 
   users = {
     motd = "
-  `yNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNy`
-    sMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMs`
-     +MMMMMh+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hMMMMM+
-      -mMMMMs                                                           sMMMMN-
-       `hMMMMh`                                                       `hMMMMd`
-         sMMMMm-                                                     -mMMMMs
-          /MMMMN/                                                   /NMMMM+
-           -NMMMMo                                                 oMMMMN-
-            `hMMMMh`                                             `hMMMMd`
-              sMMMMm.                                           .mMMMMy
-               +NMMMN/               -+ydmmmhs+-               /MMMMN+
-                -NMMMMo          `/yNMNdMMMMMNNMNy/`          oMMMMN-
-                 `dMMMMh`      :yNMm+- mMMMMMM`-+mMMh/      `hMMMMd`
-                   sMMMMm.     `/yNMms:hMMMMMm:smMNh/`     .mMMMMs
-                    /MMMMN/       `:smMMMMMMMMMms:`       /NMMMM+
-                     -mMMMMs          `:+sss+:`          sMMMMN-
-                      `dMMMMh`                         `hMMMMd`
-                        sMMMMm.                       .mMMMMs`
-                         /MMMMM/                     /MMMMM/
-                          -mMMMMs                   sMMMMm-
-                           .hMMMMh`               `hMMMMh.
-                             sMMMMm-             -mMMMMs
-                              /NMMMN/           /NMMMN/
-                               -NMMMMo         oMMMMN-
-                                `hMMMMh`     `hMMMMh`
-                                 `sMMMMm-   -mMMMMs
-                                   +NMMMN/ /NMMMN+
-                                    -mMMMMhMMMMm-
-                                     `dMMMMMMMd`
-                                       sMMMMMs
-                                        /NMN/
-                                         -d-
-
-                    Welcome to Darkserver. Let there be dark.
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::'
+  ':::::.                                                         .:::::'
+    :::::,                                                       ,:::::
+     ::::::                                                     :::::'
+      ':::::.                                                 .:::::'
+       ':::::.                                               .::::::
+         ::::::                   ......                    ,:::::
+          ::::::             .,.::::::::::::..             :::::'
+           ':::::.        .:::::::::::::::::::::.        .:::::'
+            ':::::.   ..::::::''.:::::::::.'::::::::.   .::::::
+              ::::::.::::::'    :::::::::::    ':::::::.:::::
+               :::::::::::::.   :::::::::::   .,:::::::::::'
+                ':::::.':::::::..:::::::::'..::::::'.:::::'
+                 ':::::.  '::::::::::::::::::::''  .:::::
+                   ::::::     '::::::::::::''     ,:::::
+                    ::::::         '''''         :::::'
+                     ':::::.                   .:::::'
+                      ':::::.                 .::::::
+                        ::::::               ,:::::
+                         ':::::             :::::'
+                          ':::::.         .:::::'
+                           ':::::.       .:::::'
+                             ::::::     ,:::::
+                              ':::::   :::::'
+                               ':::::.:::::'
+                                 :::::::::'
+                                  :::::::
+                                   ':::'
+                                     '
+                 Welcome to Darkserver. Let there be dark.
 
 ";
     users = {
