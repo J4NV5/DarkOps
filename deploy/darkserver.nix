@@ -398,7 +398,7 @@ in
     };
     go-neb = {
       enable = true;
-      baseUrl = "${config.networking.domain}";
+      baseUrl = "https://${config.networking.domain}";
       config = {
         clients = [{
           UserID = "@B1-66ER:dark.fi";
@@ -413,6 +413,35 @@ in
           ID = "github_realm";
           Type =  "github";
         }];
+        services = [
+          # {
+          #   ID = "github_webhook_service";
+          #   Type = "github-webhook";
+          #   UserID = "@another_goneb:localhost";
+          #   Config = {
+          #     RealmID = "github_realm";
+          #     ClientUserID = "@YOUR_USER_ID:localhost"; # needs to be an authenticated user so Go-NEB can create webhooks.
+          #     Rooms = [
+          #       "!someroom:id" = {
+          #         Repos = [
+          #           "matrix-org/synapse" = {
+          #             Events = ["push", "issues"];
+          #           };
+          #         ];
+          #       };
+          #     ];
+          #   };
+          # };
+
+          {
+            ID = "github_cmd_service";
+            Type = "github";
+            UserID = "@B1-66ER:dark.fi"; # requires a Syncing client
+            Config = {
+              RealmID = "github_realm";
+            };
+          }
+        ];
       };
     };
     postgresql = {
