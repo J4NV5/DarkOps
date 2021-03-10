@@ -1,9 +1,9 @@
 { lib, config, pkgs, ... }:
 let
   shcfg = config.services.sourcehut;
-  # srht-modules = "/home/janus/src/darkfi/nixpkgs";
+  srht-modules = "/home/janus/src/darkfi/nixpkgs";
   # WIP PR
-  srht-modules = fetchTarball "https://git.dark.fi/~janus/nixpkgs/archive/b58438e69247770444c35e354ef9f99691c48748.tar.gz";
+  #srht-modules = fetchTarball "https://git.dark.fi/~janus/nixpkgs/archive/b58438e69247770444c35e354ef9f99691c48748.tar.gz";
   pkgs-srht = import (srht-modules) {};
 
 in
@@ -33,13 +33,25 @@ in
           ];
           allowedTCPPortRanges = range;
           allowedTCPPorts = [
-            80 443 1025 3478 3479 53589
+            80 443 1025 3478 3479 8008 53589
             5007 5001 5002 5003 5004 5005 5006 5011 5014
             5107 5101 5102 5103 5104 5105 5106 5111 5114
-            9418
+            9418 4050
           ];
         };
     };
+    # nat = {
+    #   enable = true;
+    #   externalInterface = "ens3";
+    #   forwardPorts = [
+    #     {
+    #       destination = "127.0.0.1:8008";
+    #       proto = "tcp";
+    #       sourcePort = 8008;
+    #       loopbackIPs = [ "127.0.0.1" ];
+    #     }
+    #   ];
+    # };
   };
 
   time.timeZone = "Europe/Amsterdam";
@@ -126,6 +138,10 @@ in
       settings."git.sr.ht" = {
         origin = "https://git.${config.networking.domain}";
         outgoing-domain = "https://git.${config.networking.domain}";
+        oauth-client-id =
+          "${builtins.readFile ./secrets/sourcehut/git_client_id}";
+        oauth-client-secret =
+          "${builtins.readFile ./secrets/sourcehut/git_client_secret}";
         repos = "/var/lib/git";
       };
       settings."hub.sr.ht" = {
@@ -380,6 +396,25 @@ in
           client_base_url: "https://element.${config.networking.domain}"
       '';
     };
+    go-neb = {
+      enable = true;
+      baseUrl = "${config.networking.domain}";
+      config = {
+        clients = [{
+          UserID = "@B1-66ER:dark.fi";
+          AccessToken = "${builtins.readFile ./secrets/matrix_bot_access_token}";
+          HomeserverURL = "http://localhost:8008";
+          Sync = true;
+          AutoJoinRooms = true;
+          DisplayName = "B1-66ER";
+          AcceptVerificationFromUsers = [":localhost:8008"];
+        }];
+        realm = [{
+          ID = "github_realm";
+          Type =  "github";
+        }];
+      };
+    };
     postgresql = {
       enable = true;
       initialScript = pkgs.writeText "synapse-init.sql" ''
@@ -461,10 +496,17 @@ in
       matrix-synapse
       taskwarrior
       libressl
+      lsof
+      nmap
       git
 
       screen
       hydroxide
+
+      python
+      python38Packages.virtualenv
+
+      tcpdump
     ];
     variables = {
       TERM = "xterm-color";
@@ -481,37 +523,35 @@ in
 
   users = {
     motd = "
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
- ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::'
-  ':::::.                                                         .:::::'
-    :::::,                                                       ,:::::
-     ::::::                                                     :::::'
-      ':::::.                                                 .:::::'
-       ':::::.                                               .::::::
-         ::::::                   ......                    ,:::::
-          ::::::             .,.::::::::::::..             :::::'
-           ':::::.        .:::::::::::::::::::::.        .:::::'
-            ':::::.   ..::::::''.:::::::::.'::::::::.   .::::::
-              ::::::.::::::'    :::::::::::    ':::::::.:::::
-               :::::::::::::.   :::::::::::   .,:::::::::::'
-                ':::::.':::::::..:::::::::'..::::::'.:::::'
-                 ':::::.  '::::::::::::::::::::''  .:::::
-                   ::::::     '::::::::::::''     ,:::::
-                    ::::::         '''''         :::::'
-                     ':::::.                   .:::::'
-                      ':::::.                 .::::::
-                        ::::::               ,:::::
-                         ':::::             :::::'
-                          ':::::.         .:::::'
-                           ':::::.       .:::::'
-                             ::::::     ,:::::
-                              ':::::   :::::'
-                               ':::::.:::::'
-                                 :::::::::'
-                                  :::::::
-                                   ':::'
-                                     '
-                 Welcome to Darkserver. Let there be dark.
+  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+   ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::'
+    ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::'
+     ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::'
+       :::::::::::::::::::::::::''''::::::::::::::::::::::::::
+        ::::::::::::::::::::'    ...    '::::::::::::::::::::
+         ::::::::::::::::'   .:::::::::.   '::::::::::::::::
+          :::::::::::::'    :::::::::::::    '::::::::::::'
+           ':::::::::'     :::::'   ':::::     ':::::::::'
+            ':::::::.      :::::     :::::      .:::::::'
+             '::::::::     :::::.   .:::::     ::::::::'
+               ::::::::.    :::::::::::::    .::::::::
+                :::::::::.   ':::::::::'    .::::::::'
+                 :::::::::::.           .:::::::::::
+                  ':::::::::::::::::::::::::::::::'
+                   ':::::::::::::::::::::::::::::'
+                    ':::::::::::::::::::::::::::'
+                      :::::::::::::::::::::::::
+                       :::::::::::::::::::::::
+                        :::::::::::::::::::::
+                         ::::::::::::::::::'
+                          ':::::::::::::::'
+                           ':::::::::::::'
+                            ':::::::::::'
+                              :::::::::
+                               :::::::
+                                :::::
+                                 ':'
+              Welcome to Darkserver. Let there be dark.
 
 ";
     users = {
