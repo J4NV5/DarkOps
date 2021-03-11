@@ -36,7 +36,7 @@ in
             80 443 1025 3478 3479 8008 53589
             5007 5001 5002 5003 5004 5005 5006 5011 5014
             5107 5101 5102 5103 5104 5105 5106 5111 5114
-            9418 4050
+            9418
           ];
         };
     };
@@ -235,7 +235,7 @@ in
             # '';
           };
           locations."/_matrix" = {
-            proxyPass = "http://[::1]:8008";
+            proxyPass = "http://localhost:8008";
           };
         };
         "element.${config.networking.domain}" = {
@@ -244,6 +244,11 @@ in
           locations."/" = {
             root = pkgs.element-web;
           };
+        };
+
+        "bot.${config.networking.domain}" = {
+          forceSSL = true;
+          enableACME = true;
         };
 
         ${config.services.jitsi-meet.hostName} = {
@@ -279,7 +284,9 @@ in
             add_header Access-Control-Allow-Origin *;
             return 200 '${builtins.toJSON client}';
           '';
-
+          locations."= /services" = {
+            proxyPass = "http://localhost:4050";
+          };
         };
         "builds.${config.networking.domain}" = {
           forceSSL = true;
@@ -365,7 +372,7 @@ in
       listeners = [
         {
           port = 8008;
-          bind_address = "::1";
+          bind_address = "";
           type = "http";
           tls = false;
           x_forwarded = true;
@@ -398,45 +405,67 @@ in
     };
     go-neb = {
       enable = true;
-      baseUrl = "https://${config.networking.domain}";
+      baseUrl = "https://bot.${config.networking.domain}";
       config = {
         clients = [{
-          UserID = "@B1-66ER:dark.fi";
-          AccessToken = "${builtins.readFile ./secrets/matrix_bot_access_token}";
+          UserID = "@b1-66er:dark.fi";
+          AccessToken =
+            "${builtins.readFile ./secrets/matrix_bot_access_token}";
           HomeserverURL = "http://localhost:8008";
           Sync = true;
           AutoJoinRooms = true;
           DisplayName = "B1-66ER";
-          AcceptVerificationFromUsers = [":localhost:8008"];
+          #AcceptVerificationFromUsers = [":localhost:8008"];
         }];
-        realm = [{
-          ID = "github_realm";
-          Type =  "github";
-        }];
+        realms = [
+          {
+            ID = "github_realm";
+            Type =  "github";
+            Config = {};
+          }
+        ];
+        sessions = [
+          {
+            SessionID = "github_session";
+            RealmID = "github_realm";
+            UserID = "@b1-66er:dark.fi";
+            Config = {
+              AccessToken =
+                "${builtins.readFile ./secrets/github_session_token}";
+              Scopes = "admin:org_hook,admin:repo_hook,repo,user";
+            };
+          }
+        ];
         services = [
-          # {
-          #   ID = "github_webhook_service";
-          #   Type = "github-webhook";
-          #   UserID = "@another_goneb:localhost";
-          #   Config = {
-          #     RealmID = "github_realm";
-          #     ClientUserID = "@YOUR_USER_ID:localhost"; # needs to be an authenticated user so Go-NEB can create webhooks.
-          #     Rooms = [
-          #       "!someroom:id" = {
-          #         Repos = [
-          #           "matrix-org/synapse" = {
-          #             Events = ["push", "issues"];
-          #           };
-          #         ];
-          #       };
-          #     ];
-          #   };
-          # };
+          {
+            ID = "echo_service";
+            Type = "echo";
+            UserID = "@b1-66er:dark.fi";
+            Config = {};
+          }
+          {
+            ID = "github_webhook_service";
+            Type = "github-webhook";
+            UserID = "@b1-66er:dark.fi";
+            Config = {
+              RealmID = "github_realm";
+              ClientUserID = "@b1-66er:dark.fi";
+              Rooms = {
+                "!MODZOZydPqCRdulXmR:dark.fi" = {
+                  Repos = {
+                    "zkjanus/matrix-action" = {
+                        Events = ["push" "issues"];
+                      };
+                  };
+                };
+              };
+            };
+          }
 
           {
             ID = "github_cmd_service";
             Type = "github";
-            UserID = "@B1-66ER:dark.fi"; # requires a Syncing client
+            UserID = "@b1-66er:dark.fi"; # requires a Syncing client
             Config = {
               RealmID = "github_realm";
             };
@@ -529,6 +558,7 @@ in
       nmap
       git
 
+      jq
       screen
       hydroxide
 
