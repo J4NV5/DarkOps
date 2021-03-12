@@ -36,7 +36,7 @@ in
             80 443 1025 3478 3479 8008 53589
             5007 5001 5002 5003 5004 5005 5006 5011 5014
             5107 5101 5102 5103 5104 5105 5106 5111 5114
-            9418
+            9418 4050
           ];
         };
     };
@@ -249,6 +249,8 @@ in
         "bot.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
+          locations."/".proxyPass = "http://127.0.0.1:4050";
+          locations."/".proxyWebsockets = true;
         };
 
         ${config.services.jitsi-meet.hostName} = {
@@ -284,9 +286,6 @@ in
             add_header Access-Control-Allow-Origin *;
             return 200 '${builtins.toJSON client}';
           '';
-          locations."= /services" = {
-            proxyPass = "http://localhost:4050";
-          };
         };
         "builds.${config.networking.domain}" = {
           forceSSL = true;
@@ -411,11 +410,12 @@ in
           UserID = "@b1-66er:dark.fi";
           AccessToken =
             "${builtins.readFile ./secrets/matrix_bot_access_token}";
+          DeviceID = "YEJSJRTHQZ";
           HomeserverURL = "http://localhost:8008";
           Sync = true;
           AutoJoinRooms = true;
           DisplayName = "B1-66ER";
-          #AcceptVerificationFromUsers = [":localhost:8008"];
+          AcceptVerificationFromUsers = [":localhost:8008"];
         }];
         realms = [
           {
@@ -453,8 +453,22 @@ in
               Rooms = {
                 "!MODZOZydPqCRdulXmR:dark.fi" = {
                   Repos = {
-                    "zkjanus/matrix-action" = {
-                        Events = ["push" "issues"];
+                    "zkjanus/test" = {
+                        Events = ["push" "issues" "pull_requests" ];
+                      };
+                  };
+                };
+                "!vGesDLlJvGYvCvlqvU:dark.fi" = {
+                  Repos = {
+                    "zkjanus/test" = {
+                        Events = ["push" "issues" "pull_request" ];
+                      };
+                  };
+                };
+                "!SbqmlkNmPfTPsCdsdh:dark.fi" = {
+                  Repos = {
+                    "zkjanus/test" = {
+                        Events = ["push" "issues" "pull_request" ];
                       };
                   };
                 };
