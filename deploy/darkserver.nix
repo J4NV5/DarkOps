@@ -36,7 +36,7 @@ in
             80 443 1025 3478 3479 8008 53589
             5007 5001 5002 5003 5004 5005 5006 5011 5014
             5107 5101 5102 5103 5104 5105 5106 5111 5114
-            9418 4050
+            9418 4050 6000
           ];
         };
     };
@@ -146,6 +146,10 @@ in
       };
       settings."hub.sr.ht" = {
         origin = "https://code.${config.networking.domain}";
+        oauth-client-id =
+          "${builtins.readFile ./secrets/sourcehut/code_client_id}";
+        oauth-client-secret =
+          "${builtins.readFile ./secrets/sourcehut/code_client_secret}";
       };
       settings."builds.sr.ht" = {
         origin = "https://builds.${config.networking.domain}";
@@ -167,6 +171,10 @@ in
       };
       settings."paste.sr.ht" = {
         origin = "https://paste.${config.networking.domain}";
+        oauth-client-id =
+          "${builtins.readFile ./secrets/sourcehut/paste_client_id}";
+        oauth-client-secret =
+          "${builtins.readFile ./secrets/sourcehut/paste_client_secret}";
       };
       settings."todo.sr.ht" = {
         origin = "https://todo.${config.networking.domain}";
@@ -486,6 +494,13 @@ in
           }
         ];
       };
+    };
+    redis = {
+      enable = true;
+    };
+    dockerRegistry = {
+      enable = true;
+      port = 6000;
     };
     postgresql = {
       enable = true;
