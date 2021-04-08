@@ -5,12 +5,12 @@ import ../. {} ({ config, ... }: {
       networking.hostName = lib.mkDefault name;
     };
 
-    # Which nixpkgs version we want to use for this node
     nixpkgs = fetchTarball {
-      url = "https://github.com/NixOS/nixpkgs/tarball/721312288f7001215a0d482579cd013dec397d16";
-      sha256 = "0gfibirsmggm3f4sjq73p091ynayk2r64afks99l0nslbapwnlf8";
+      url = "https://github.com/NixOS/nixpkgs/tarball/856f48ece58767b67edf9bf8f899b1712f84e5e3";
+      sha256 = "0sg2wm6hriwqy4bc2xdfy0ri7rmhb3p9m6zi7g8vg1rb146h6mv4";
 
     };
+
   };
 
   nodes.darkserver = { lib, config, ... }: {

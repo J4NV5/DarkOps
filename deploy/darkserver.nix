@@ -1,9 +1,9 @@
 { lib, config, pkgs, ... }:
 let
   shcfg = config.services.sourcehut;
-  srht-modules = "/home/janus/src/darkfi/nixpkgs";
+  #srht-modules = "/home/janus/src/darkfi/nixpkgs";
   # WIP PR
-  #srht-modules = fetchTarball "https://git.dark.fi/~janus/nixpkgs/archive/b58438e69247770444c35e354ef9f99691c48748.tar.gz";
+  srht-modules = fetchTarball "https://git.dark.fi/~janus/nixpkgs/archive/bc2100aefde505893c533a1308f6084c14dc20c9.tar.gz";
   pkgs-srht = import (srht-modules) {};
 
 in
@@ -366,7 +366,7 @@ in
       enable = true;
       server_name = "${config.networking.domain}";
       enable_metrics = true;
-      enable_registration = false;
+      enable_registration = true;
       federation_rc_concurrent = "0";
       federation_rc_reject_limit = "0";
       registration_shared_secret =
@@ -399,6 +399,15 @@ in
       turn_user_lifetime = "1h";
       public_baseurl = "https://matrix.dark.fi/";
       extraConfig = ''
+        retention:
+          enabled: true
+          default_policy:
+            min_lifetime: 0d
+            max_lifetime: 7d
+          allowed_lifetime_max: 1w
+          purge_jobs:
+          - longest_max_lifetime: 2w
+            interval: 7d
         encryption_enabled_by_default_for_room_type: all
         email:
           smtp_host: localhost
@@ -411,14 +420,14 @@ in
       '';
     };
     go-neb = {
-      enable = true;
+      enable = false;
       baseUrl = "https://bot.${config.networking.domain}";
       config = {
         clients = [{
           UserID = "@b1-66er:dark.fi";
           AccessToken =
             "${builtins.readFile ./secrets/matrix_bot_access_token}";
-          DeviceID = "YEJSJRTHQZ";
+          DeviceID = "DANYXDWIGI";
           HomeserverURL = "http://localhost:8008";
           Sync = true;
           AutoJoinRooms = true;
