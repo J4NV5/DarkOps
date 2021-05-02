@@ -409,14 +409,6 @@ in
           - longest_max_lifetime: 2w
             interval: 7d
         encryption_enabled_by_default_for_room_type: all
-        email:
-          smtp_host: localhost
-          smtp_port: 1025
-          smtp_user: "org@dark.fi"
-          smtp_pass: "${builtins.readFile ./secrets/smtp_pass}"
-          notif_from: "%(app)s Matrix server <org@dark.fi>"
-          app_name: darkfi
-          client_base_url: "https://element.${config.networking.domain}"
       '';
     };
     go-neb = {
