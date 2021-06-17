@@ -6,8 +6,8 @@ import ../. {} ({ config, ... }: {
     };
 
     nixpkgs = fetchTarball {
-      url = "https://github.com/NixOS/nixpkgs/tarball/856f48ece58767b67edf9bf8f899b1712f84e5e3";
-      sha256 = "0sg2wm6hriwqy4bc2xdfy0ri7rmhb3p9m6zi7g8vg1rb146h6mv4";
+      url = "https://github.com/NixOS/nixpkgs/tarball/fa0326ce5233f7d592271df52c9d0812bec47b84";
+      sha256 = "1rzgjhzp5gnd49fl123cbd70zl4gmf7175150aj51h796mr7aah3";
 
     };
 

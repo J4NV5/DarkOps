@@ -26,7 +26,7 @@
 
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
-  security.rngd.enable = lib.mkDefault false;
+  #security.rngd.enable = lib.mkDefault false;
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/67203570-b8e3-4a88-b24e-883aafb29826";
       fsType = "ext4";

@@ -3,8 +3,8 @@ let
   shcfg = config.services.sourcehut;
   #srht-modules = "/home/janus/src/darkfi/nixpkgs";
   # WIP PR
-  srht-modules = fetchTarball "https://git.dark.fi/~janus/nixpkgs/archive/bc2100aefde505893c533a1308f6084c14dc20c9.tar.gz";
-  pkgs-srht = import (srht-modules) {};
+  #srht-modules = fetchTarball "https://git.dark.fi/~janus/nixpkgs/archive/bc2100aefde505893c533a1308f6084c14dc20c9.tar.gz";
+  #pkgs-srht = import (srht-modules) {};
 
 in
 {
@@ -12,7 +12,7 @@ in
   imports = [
     ./hardware/v2d-config.nix
     # Import only the sourcehut modules
-    "${srht-modules}/nixos/modules/services/misc/sourcehut"
+    #"${srht-modules}/nixos/modules/services/misc/sourcehut"
   ];
 
   networking = {
@@ -80,7 +80,7 @@ in
           jitsi.preferredDomain = "jitsi.${config.networking.domain}";
         };
       };
-      sourcehut = pkgs-srht.sourcehut;
+      #sourcehut = pkgs.sourcehut;
     }
     )
   ];
@@ -300,64 +300,68 @@ in
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5002";
           locations."/query".proxyPass = "http://127.0.0.1:5102";
-          locations."/static".root = "${pkgs-srht.sourcehut.buildsrht}/${pkgs-srht.sourcehut.python.sitePackages}/buildsrht";
+          locations."/static".root = "${pkgs.sourcehut.buildsrht}/${pkgs.sourcehut.python.sitePackages}/buildsrht";
         };
         "dispatch.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5005";
           locations."/query".proxyPass = "http://127.0.0.1:5105";
-          locations."/static".root = "${pkgs-srht.sourcehut.dispatchsrht}/${pkgs.sourcehut.python.sitePackages}/dispatchsrht";
+          locations."/static".root = "${pkgs.sourcehut.dispatchsrht}/${pkgs.sourcehut.python.sitePackages}/dispatchsrht";
         };
         "git.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5001";
           locations."/query".proxyPass = "http://127.0.0.1:5101";
-          locations."/static".root = "${pkgs-srht.sourcehut.gitsrht}/${pkgs-srht.sourcehut.python.sitePackages}/gitsrht";
+          locations."/static".root = "${pkgs.sourcehut.gitsrht}/${pkgs.sourcehut.python.sitePackages}/gitsrht";
         };
         "lists.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5006";
           locations."/query".proxyPass = "http://127.0.0.1:5106";
-          locations."/static".root = "${pkgs-srht.sourcehut.listssrht}/${pkgs-srht.sourcehut.python.sitePackages}/listssrht";
+          locations."/static".root = "${pkgs.sourcehut.listssrht}/${pkgs.sourcehut.python.sitePackages}/listssrht";
         };
         "man.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5004";
           locations."/query".proxyPass = "http://127.0.0.1:5104";
-          locations."/static".root = "${pkgs-srht.sourcehut.mansrht}/${pkgs-srht.sourcehut.python.sitePackages}/mansrht";
+          locations."/static".root = "${pkgs.sourcehut.mansrht}/${pkgs.sourcehut.python.sitePackages}/mansrht";
         };
         "meta.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5007";
           locations."/query".proxyPass = "http://127.0.0.1:5107";
-          locations."/static".root = "${pkgs-srht.sourcehut.metasrht}/${pkgs-srht.sourcehut.python.sitePackages}/metasrht";
+          locations."/static".root = "${pkgs.sourcehut.metasrht}/${pkgs.sourcehut.python.sitePackages}/metasrht";
         };
         "code.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5014";
           locations."/query".proxyPass = "http://127.0.0.1:5114";
-          locations."/static".root = "${pkgs-srht.sourcehut.hubsrht}/${pkgs-srht.sourcehut.python.sitePackages}/hubsrht";
+          locations."/static".root = "${pkgs.sourcehut.hubsrht}/${pkgs.sourcehut.python.sitePackages}/hubsrht";
 
+        };
+        "hub.${config.networking.domain}" = {
+          forceSSL = lib.mkForce false;
+          enableACME = false;
         };
         "paste.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5011";
           locations."/query".proxyPass = "http://127.0.0.1:5111";
-          locations."/static".root = "${pkgs-srht.sourcehut.pastesrht}/${pkgs-srht.sourcehut.python.sitePackages}/pastesrht";
+          locations."/static".root = "${pkgs.sourcehut.pastesrht}/${pkgs.sourcehut.python.sitePackages}/pastesrht";
         };
         "todo.${config.networking.domain}" = {
           forceSSL = true;
           enableACME = true;
           locations."/".proxyPass = "http://127.0.0.1:5003";
           locations."/query".proxyPass = "http://127.0.0.1:5103";
-          locations."/static".root = "${pkgs-srht.sourcehut.todosrht}/${pkgs-srht.sourcehut.python.sitePackages}/todosrht";
+          locations."/static".root = "${pkgs.sourcehut.todosrht}/${pkgs.sourcehut.python.sitePackages}/todosrht";
         };
       }; # virtualhosts
     };
@@ -646,7 +650,6 @@ in
     users = {
       git = {
         home = "/var/lib/git";
-        isNormalUser = true;
       };
       tasks = {
         home = "/home/tasks";
