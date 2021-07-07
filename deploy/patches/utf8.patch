@@ -1,0 +1,12 @@
+diff --git a/smtp/smtp.go b/smtp/smtp.go
+index 3c4ab5b..5d47d10 100644
+--- a/smtp/smtp.go
++++ b/smtp/smtp.go
+@@ -15,6 +15,7 @@ import (
+ 
+ 	"github.com/emersion/hydroxide/auth"
+ 	"github.com/emersion/hydroxide/protonmail"
++    "github.com/emersion/go-message/charset"
+ )
+ 
+ func toPMAddressList(addresses []*mail.Address) []*protonmail.MessageAddress {

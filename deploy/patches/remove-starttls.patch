@@ -1,0 +1,12 @@
+diff --git a/srht/email.py b/srht/email.py
+index 6b34b2a..e6b74a2 100644
+--- a/srht/email.py
++++ b/srht/email.py
+@@ -115,7 +115,6 @@ def start_smtp():
+     smtp = smtplib.SMTP(smtp_host, smtp_port)
+     smtp.ehlo()
+     if smtp_user and smtp_password:
+-        smtp.starttls()
+         smtp.login(smtp_user, smtp_password)
+     return smtp
+ 

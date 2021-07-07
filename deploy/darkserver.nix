@@ -413,6 +413,12 @@ in
           - longest_max_lifetime: 2w
             interval: 7d
         encryption_enabled_by_default_for_room_type: all
+        auto_join_rooms:
+          - "#dev:dark.fi"
+          - "#markets:dark.fi"
+          - "#research:dark.fi"
+          - "#sysop:dark.fi"
+          - "#announce:dark.fi"
       '';
     };
     go-neb = {
