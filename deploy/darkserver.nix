@@ -426,7 +426,7 @@ in
           default_policy:
             min_lifetime: 0d
             max_lifetime: 7d
-          allowed_lifetime_max: 1w
+          allowed_lifetime_max: 2y
           purge_jobs:
           - longest_max_lifetime: 2w
             interval: 7d
