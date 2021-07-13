@@ -287,6 +287,9 @@ in
           enableACME = true;
           forceSSL = true;
           root = "/var/www/dark.fi/build";
+          locations."/".proxyPass = lib.mkForce null;
+          locations."/query".proxyPass = lib.mkForce null;
+          locations."/static".root = lib.mkForce null;
 
           locations."= /.well-known/matrix/server".extraConfig =
             let
