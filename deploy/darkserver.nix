@@ -76,6 +76,10 @@ in
               "base_url" = "https://vector.im";
             };
           };
+          showLabsSettings = true;
+          features = {
+            feature_latex_maths = true;
+          };
 
           jitsi.preferredDomain = "jitsi.${config.networking.domain}";
         };
