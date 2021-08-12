@@ -452,6 +452,7 @@ in
           - "#research:dark.fi"
           - "#sysop:dark.fi"
           - "#announce:dark.fi"
+          - "#memes:dark.fi"
       '';
     };
     go-neb = {
