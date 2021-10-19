@@ -6,8 +6,8 @@ import ../. {} ({ config, ... }: {
     };
 
     nixpkgs = fetchTarball {
-      url = "https://github.com/zkjanus/nixpkgs/tarball/55572e9abb81743f5406988b45b70216c88ab0fb";
-    sha256 = "16xcmggiybz33mpc9lxqvj98pgq0prdwly018j5cq0c13xz31a6g";
+      url = "https://github.com/zkjanus/nixpkgs/tarball/44d823045803154544e5055d62e31f0a7be6b73d";
+      sha256 = "1if3mcgxnkl79mcx13g8h5x7ys8bdxsrcb2kikzmbrp5y4i7b8v6";
     };
     # nixpkgs = fetchTarball {
     #   url = "https://github.com/NixOS/nixpkgs/tarball/fa0326ce5233f7d592271df52c9d0812bec47b84";
@@ -17,11 +17,18 @@ import ../. {} ({ config, ... }: {
 
   };
 
-  nodes.darkserver = { lib, config, ... }: {
-    host = "root@dark.fi";
+  # nodes.darkserver = { lib, config, ... }: {
+  #   host = "root@dark.fi";
+  #   successTimeout = 100;
+  #   switchTimeout = 180;
+  #   configuration = ./darkserver.nix;
+  # };
+  nodes.darkfi-services = { lib, config, ... }: {
+    host = "root@185.165.171.77";
     successTimeout = 100;
     switchTimeout = 180;
-    configuration = ./darkserver.nix;
+    configuration = ./darkfi-services.nix;
   };
+
 
 })
