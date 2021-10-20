@@ -76,19 +76,17 @@
       recommendedProxySettings = true;
 
       virtualHosts = {
-        "gateway-beta.${config.networking.domain}" = {
-          forceSSL = false;
-          enableACME = false;
-          locations."/" = {
-            proxyPass = "http://localhost:8008";
-          };
-
+        "testnet.gateway-protocol.${config.networking.domain}" = {
+          forceSSL = true;
+          enableACME = true;
         };
-        "cashier-beta.${config.networking.domain}" = {
-          forceSSL = false;
-          enableACME = false;
-          locations."/".proxyPass = "http://127.0.0.1:4050";
-          #locations."/".proxyWebsockets = true;
+        "testnet.gateway-publish.${config.networking.domain}" = {
+          forceSSL = true;
+          enableACME = true;
+        };
+        "testnet.cashier.${config.networking.domain}" = {
+          forceSSL = true;
+          enableACME = true;
         };
         "185.165.171.77" = {
           enableACME = false;
@@ -150,8 +148,8 @@
       TERM = "xterm-color";
     };
     pathsToLink = [
-    "/share/nix-direnv"
-  ];
+      "/share/nix-direnv"
+    ];
   };
 
   sound.enable = false;
@@ -189,8 +187,10 @@ Welcome to Darkfi-services. Let there be dark.
         openssh.authorizedKeys.keys =
           import ./secrets/pubkeys/tasks.nix { inherit pkgs; };
         openssh.authorizedKeys.keyFiles = [
+          ./secrets/pubkeys/parazyd
           ./secrets/pubkeys/pythia
           ./secrets/pubkeys/root
+          ./secrets/pubkeys/xesan
         ];
       };
     };
